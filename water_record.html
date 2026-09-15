@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>海邊微風 // 每日補水日誌</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ocean: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e'
+                        },
+                        sand: {
+                            50: '#fefdf8',
+                            100: '#fef9c3',
+                            200: '#fef08a'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'Noto Sans TC', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <style>
+        body {
+            background: linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 45%, #fefcf5 100%);
+            color: #0f172a;
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(14px);
+            border: 1px solid rgba(186, 230, 253, 0.7);
+            box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.08), 0 8px 10px -6px rgba(14, 165, 233, 0.04);
+        }
+        .glass-inner {
+            background: rgba(240, 249, 255, 0.6);
+            border: 1px solid rgba(186, 230, 253, 0.6);
+        }
+        .water-wave {
+            transition: height 0.65s cubic-bezier(0.34, 1.2, 0.64, 1);
+        }
+        @keyframes float-gentle {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+        }
+        .floating-bubble {
+            animation: float-gentle 3s ease-in-out infinite;
+        }
+        @keyframes ripple {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .wave-crest {
+            position: absolute;
+            top: -6px;
+            left: 0;
+            width: 200%;
+            height: 12px;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.85) 0%, rgba(56,189,248,0.3) 70%);
+            animation: ripple 4s linear infinite;
+        }
+        @keyframes pourStreamDrop {
+            0% {
+                transform: scaleY(0);
+                opacity: 0;
+            }
+            20% {
+                transform: scaleY(1);
+                opacity: 0.95;
+            }
+            80% {
+                transform: scaleY(1);
+                opacity: 0.95;
+            }
+            100% {
+                transform: scaleY(0.9);
+                opacity: 0;
+            }
+        }
+        .pouring-stream {
+            transform-origin: top center;
+            animation: pourStreamDrop 0.65s ease-out forwards;
+            background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(56,189,248,0.9) 40%, rgba(14,165,233,0.95) 90%, rgba(255,255,255,0.95) 100%);
+            box-shadow: 0 0 10px rgba(56, 189, 248, 0.5), inset 1px 0 2px rgba(255,255,255,0.85);
+        }
+        @keyframes splashParticle {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 0.95;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0.1);
+                opacity: 0;
+            }
+        }
+        .splash-drop {
+            position: absolute;
+            border-radius: 9999px;
+            pointer-events: none;
+            animation: splashParticle 0.55s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+        }
+        @keyframes surfaceRippleRing {
+            0% {
+                transform: scale(0.2);
+                opacity: 0.9;
+            }
+            100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+        .surface-ripple {
+            position: absolute;
+            border: 2px solid rgba(255, 255, 255, 0.85);
+            border-radius: 9999px;
+            pointer-events: none;
+            animation: surfaceRippleRing 0.6s ease-out forwards;
+        }
+        @keyframes bubbleRise {
+            0% {
+                transform: translateY(0) scale(0.6);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(-40px) scale(1.1);
+                opacity: 0;
+            }
+        }
+        .stream-bubble {
+            animation: bubbleRise 0.75s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+            position: absolute;
+            pointer-events: none;
+            border-radius: 9999px;
+            background: radial-gradient(circle at 35% 35%, rgba(255,255,255,0.9), rgba(186,230,253,0.4));
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        @keyframes bottleJiggle {
+            0% { transform: scale(1); }
+            20% { transform: scale(1.02, 0.98); }
+            50% { transform: scale(0.99, 1.01); }
+            80% { transform: scale(1.01, 0.995); }
+            100% { transform: scale(1); }
+        }
+        .bottle-active {
+            animation: bottleJiggle 0.55s ease-out;
+        }
+        /* Open Tumbler Rim Styling */
+        .glass-rim {
+            background: linear-gradient(90deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.95) 50%, rgba(255,255,255,0.4) 100%);
+            box-shadow: 0 2px 6px rgba(14, 165, 233, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans justify-between p-3.5 sm:p-6 text-sm">
+
+    <!-- Top Header -->
+    <header class="max-w-md w-full mx-auto flex items-center justify-between pb-3.5 border-b border-ocean-200/60">
+        <div class="flex items-center space-x-2.5">
+            <div class="w-9 h-9 rounded-2xl bg-gradient-to-br from-cyan-400 to-ocean-600 flex items-center justify-center text-white shadow-md shadow-ocean-300/50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M3 18c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="text-xs font-extrabold tracking-wider text-ocean-800 flex items-center gap-1">
+                    OCEAN BREEZE
+                    <span class="text-[10px] bg-cyan-100 text-cyan-800 px-1.5 py-0.5 rounded-full font-medium">海風補水</span>
+                </div>
+                <div class="text-[10px] text-ocean-600/80 font-medium">清爽補足每日活力</div>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <!-- Sound Toggle -->
+            <button id="sound-btn" class="w-8 h-8 rounded-full glass-inner text-ocean-700 hover:bg-ocean-100 flex items-center justify-center text-xs transition-all shadow-sm" title="水滴音效">
+                💧
+            </button>
+            <!-- Stats Modal Trigger -->
+            <button id="open-stats-btn" class="px-3.5 py-1.5 rounded-full glass-card hover:bg-white text-ocean-700 font-semibold text-xs flex items-center gap-1.5 transition-all shadow-sm border border-ocean-200">
+                <svg class="w-3.5 h-3.5 text-ocean-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                統計日誌
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Focus Area -->
+    <main class="max-w-md w-full mx-auto flex-1 flex flex-col justify-center py-4 space-y-5">
+        
+        <!-- 1. Daily Goal Setting -->
+        <div class="glass-card px-4 py-3 rounded-2xl flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-base">🎯</span>
+                <span class="text-xs font-semibold text-ocean-800">今日飲水目標</span>
+            </div>
+            <div class="flex items-center space-x-1.5">
+                <input type="number" id="goal-input" step="100" min="500" max="6000"
+                    class="w-20 bg-white/90 border border-ocean-200 rounded-xl px-2 py-1 text-right text-ocean-800 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-ocean-400">
+                <span class="text-xs text-ocean-500 font-medium">ml</span>
+            </div>
+        </div>
+
+        <!-- 2. Central Ocean Bottle / Gauge -->
+        <div class="glass-card rounded-3xl p-6 flex flex-col items-center relative overflow-hidden">
+            <!-- Decorative beach background glow -->
+            <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-200/40 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-10 -left-10 w-32 h-32 bg-blue-200/30 rounded-full blur-2xl pointer-events-none"></div>
+
+            <!-- Pouring Spout Indicator (Appears when water is poured) -->
+            <div id="spout-indicator" class="h-7 flex items-center justify-center opacity-0 transition-all duration-300 pointer-events-none mb-2 z-30">
+                <div class="flex items-center gap-1.5 text-[11px] font-bold text-ocean-700 bg-white/95 px-3.5 py-1 rounded-full shadow-md border border-cyan-200 backdrop-blur-sm">
+                    <span class="animate-bounce text-xs">💧</span>
+                    <span id="pouring-amount-badge">+250ml 注入中...</span>
+                </div>
+            </div>
+
+            <!-- Glass Water Tumbler Container with Open Top Rim -->
+            <div class="relative flex flex-col items-center">
+                <!-- Tumbler Open Top Rim -->
+                <div class="w-36 h-3 rounded-[50%] glass-rim border border-white/90 z-20 mb-[-6px] shadow-sm"></div>
+
+                <!-- Glass Tumbler Body -->
+                <div id="bottle-wrapper" class="relative w-36 h-56 rounded-b-[32px] rounded-t-sm border-x-4 border-b-4 border-t-0 border-white/90 bg-gradient-to-b from-sky-50/70 via-blue-50/50 to-blue-100/70 shadow-inner flex flex-col justify-end p-0.5 transition-transform duration-200 relative overflow-hidden backdrop-blur-[2px]">
+                    
+                    <!-- Glass Reflection Highlight Bar -->
+                    <div class="absolute top-2 left-2.5 w-2 h-44 bg-gradient-to-b from-white/70 via-white/30 to-transparent rounded-full pointer-events-none z-20"></div>
+                    
+                    <!-- Floating Bubble Indicator (Subtle Waterdrop Icon inside) -->
+                    <div class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20 z-10">
+                        <svg class="w-16 h-16 text-cyan-600 fill-current floating-bubble" viewBox="0 0 24 24">
+                            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+                        </svg>
+                    </div>
+
+                    <!-- Air Space / Pouring Stream Container (Only spans down to the liquid surface!) -->
+                    <div id="pour-air-space" class="absolute inset-x-0 top-0 pointer-events-none z-20" style="bottom: 0%;">
+                        <!-- Dynamic pouring water stream injected here -->
+                    </div>
+                    
+                    <!-- Rising Ocean Liquid (Liquid volume is on top of air stream, so stream never pierces liquid!) -->
+                    <div id="liquid-bar" class="water-wave w-full bg-gradient-to-t from-ocean-600 via-sky-400 to-cyan-300 relative rounded-b-[26px] z-10" style="height: 0%;">
+                        <!-- Wave Foam Surface / Crest with ripple overlay -->
+                        <div class="absolute -top-2 left-0 right-0 h-3.5 bg-gradient-to-r from-cyan-100/90 via-white to-cyan-100/90 shadow-sm rounded-t-full flex items-center justify-center">
+                            <div class="w-16 h-1 bg-white/70 rounded-full blur-[0.5px]"></div>
+                        </div>
+                        <!-- Bubbles inside rising liquid -->
+                        <div id="liquid-bubbles-container" class="absolute inset-0 overflow-hidden pointer-events-none"></div>
+                    </div>
+                    
+                    <!-- Progress Percentage Badge -->
+                    <div class="absolute top-2.5 right-3 bg-white/90 text-ocean-700 font-extrabold text-[11px] px-2 py-0.5 rounded-full shadow-sm z-30 border border-ocean-100/80">
+                        <span id="percent-label">0%</span>
+                    </div>
+                </div>
+
+                <!-- Cup Bottom Shadow -->
+                <div class="w-28 h-2.5 bg-ocean-300/30 rounded-[50%] blur-sm mt-1"></div>
+            </div>
+
+            <!-- Quantitative Progress Display -->
+            <div class="text-center mt-3">
+                <div class="text-2xl font-black text-ocean-900 tracking-tight">
+                    <span id="today-total">0</span>
+                    <span class="text-xs font-semibold text-ocean-400">/ <span id="today-goal">2500</span> ml</span>
+                </div>
+                <div class="text-[11px] text-ocean-600 font-medium mt-0.5">
+                    距離達標還差 <span id="today-remaining" class="font-bold text-cyan-700">2500</span> ml 🌊
+                </div>
+            </div>
+
+            <!-- Quick Add Controls Header -->
+            <div class="w-full flex items-center justify-between mt-2 px-1">
+                <span class="text-xs font-bold text-ocean-800">快速記錄 (+ML)</span>
+                <span class="text-ocean-500 font-normal text-[10px]">一鍵喝水打卡</span>
+            </div>
+            
+            <div class="grid grid-cols-4 gap-2">
+                <button class="quick-btn py-3 bg-white/85 hover:bg-cyan-50 border border-ocean-200 hover:border-cyan-400 rounded-2xl text-center transition-all shadow-sm active:scale-95 group" data-amount="150">
+                    <span class="text-[10px] text-ocean-400 block group-hover:text-ocean-600">小口啜飲</span>
+                    <div class="text-sm font-black text-ocean-800">+150</div>
+                </button>
+                <button class="quick-btn py-3 bg-white/85 hover:bg-cyan-50 border border-ocean-200 hover:border-cyan-400 rounded-2xl text-center transition-all shadow-sm active:scale-95 group" data-amount="250">
+                    <span class="text-[10px] text-ocean-400 block group-hover:text-ocean-600">標準馬克杯</span>
+                    <div class="text-sm font-black text-ocean-800">+250</div>
+                </button>
+                <button class="quick-btn py-3 bg-white/85 hover:bg-cyan-50 border border-ocean-200 hover:border-cyan-400 rounded-2xl text-center transition-all shadow-sm active:scale-95 group" data-amount="350">
+                    <span class="text-[10px] text-ocean-400 block group-hover:text-ocean-600">大杯飲料</span>
+                    <div class="text-sm font-black text-ocean-800">+350</div>
+                </button>
+                <button class="quick-btn py-3 bg-white/85 hover:bg-cyan-50 border border-ocean-200 hover:border-cyan-400 rounded-2xl text-center transition-all shadow-sm active:scale-95 group" data-amount="500">
+                    <span class="text-[10px] text-ocean-400 block group-hover:text-ocean-600">運動水瓶</span>
+                    <div class="text-sm font-black text-ocean-800">+500</div>
+                </button>
+            </div>
+
+            <!-- Custom ml form -->
+            <form id="custom-add-form" class="flex gap-2 pt-1">
+                <input type="number" id="custom-amount" min="10" max="3000" step="10" placeholder="自訂飲水量 (ml)..." required
+                    class="flex-1 bg-white/90 border border-ocean-200 rounded-xl px-3.5 py-2 text-xs text-ocean-900 placeholder-ocean-300 focus:outline-none focus:ring-2 focus:ring-cyan-400">
+                <button type="submit" class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-ocean-600 hover:from-cyan-400 hover:to-ocean-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20 active:scale-95">
+                    + 記錄
+                </button>
+            </form>
+        </div>
+
+    </main>
+
+    <!-- Modal: Statistics & History -->
+    <div id="stats-modal" class="fixed inset-0 bg-ocean-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="glass-card w-full max-w-md rounded-3xl p-5 shadow-2xl flex flex-col max-h-[85vh] space-y-4 border border-white">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-ocean-100 pb-3">
+                <div class="flex items-center space-x-2 text-ocean-800 font-bold text-sm">
+                    <span class="text-base">📊</span>
+                    <span>飲水統計與紀錄明細</span>
+                </div>
+                <button id="close-stats-btn" class="text-ocean-400 hover:text-ocean-700 p-1 text-lg font-bold leading-none">&times;</button>
+            </div>
+
+            <!-- 7-Day Ocean Bar Chart -->
+            <div>
+                <div class="text-[11px] text-ocean-700 mb-2 font-bold flex items-center justify-between">
+                    <span>近 7 日達標狀況</span>
+                    <span class="text-[10px] text-ocean-400 font-normal">金黃色代表達成目標</span>
+                </div>
+                <div id="stats-chart" class="h-28 flex items-end justify-between gap-2 p-2.5 bg-white/70 rounded-2xl border border-ocean-100">
+                    <!-- Dynamic Bars injected here -->
+                </div>
+            </div>
+
+            <!-- Today's Logs Detail -->
+            <div class="flex-1 flex flex-col min-h-0">
+                <div class="flex items-center justify-between text-[11px] text-ocean-700 mb-2 font-bold">
+                    <span>今日紀錄日誌</span>
+                    <button id="clear-today-btn" class="text-red-400 hover:text-red-600 text-[10px] font-medium">清空今日</button>
+                </div>
+                <div id="logs-container" class="flex-1 overflow-y-auto space-y-1.5 pr-1 max-h-36">
+                    <!-- Logs list injected here -->
+                </div>
+            </div>
+
+            <button id="stats-done-btn" class="w-full py-2.5 bg-ocean-100 hover:bg-ocean-200 text-ocean-800 font-bold text-xs rounded-xl transition-colors">
+                關閉視窗
+            </button>
+        </div>
+    </div>
+
+    <!-- Mini Beach Toast Feedback -->
+    <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-ocean-800 text-white font-medium text-xs px-4 py-2 rounded-full shadow-lg shadow-ocean-800/20 opacity-0 transition-opacity pointer-events-none duration-300 z-50 flex items-center gap-1.5">
+        <span>💧</span>
+        <span id="toast-text">已記錄</span>
+    </div>
+
+    <script>
+        // Storage Keys
+        const STORAGE_KEY_LOGS = 'ocean_water_logs';
+        const STORAGE_KEY_GOAL = 'ocean_water_goal';
+        const STORAGE_KEY_SOUND = 'ocean_water_sound';
+
+        // State
+        let dailyGoal = 2500;
+        let logs = [];
+        let soundEnabled = true;
+        let synth = null;
+
+        // Soothing Water drop & ocean sound synthesizer
+        function initAudio() {
+            if (synth || typeof Tone === 'undefined') return;
+            try {
+                synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.002, decay: 0.25, sustain: 0.02, release: 0.2 }
+                }).toDestination();
+                synth.volume.value = -8;
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+
+        function playWaterChime(amount, isGoal = false) {
+            if (!soundEnabled) return;
+            try {
+                initAudio();
+                if (Tone.context.state !== 'running') Tone.context.resume();
+                if (!synth) return;
+                const now = Tone.now();
+                if (isGoal) {
+                    synth.triggerAttackRelease(["C5", "G5", "C6"], "8n", now);
+                } else {
+                    if (amount >= 500) {
+                        synth.triggerAttackRelease(["F5", "A5", "C6"], "16n", now);
+                        synth.triggerAttackRelease(["C6", "E6"], "16n", now + 0.12);
+                    } else if (amount >= 300) {
+                        synth.triggerAttackRelease(["G5", "B5"], "16n", now);
+                        synth.triggerAttackRelease(["D6"], "16n", now + 0.1);
+                    } else {
+                        synth.triggerAttackRelease(["A5", "E6"], "16n", now);
+                    }
+                }
+            } catch (e) {}
+        }
+
+        // Animated pouring stream with relative size based on amount
+        function triggerPourAnimation(amount, prevPercent, newPercent) {
+            const airSpace = document.getElementById('pour-air-space');
+            const bubblesContainer = document.getElementById('liquid-bubbles-container');
+            const bottleWrapper = document.getElementById('bottle-wrapper');
+            const spoutBadge = document.getElementById('spout-indicator');
+            const badgeText = document.getElementById('pouring-amount-badge');
+
+            // 1. Show Spout Indicator Badge
+            badgeText.textContent = `+${amount} ml 注入中...`;
+            spoutBadge.classList.remove('opacity-0', 'translate-y-1');
+            spoutBadge.classList.add('opacity-100', 'translate-y-0');
+
+            // 2. Add cup subtle impact jiggle
+            bottleWrapper.classList.remove('bottle-active');
+            void bottleWrapper.offsetWidth; // force reflow
+            bottleWrapper.classList.add('bottle-active');
+
+            // Clear any lingering stream elements
+            airSpace.innerHTML = '';
+
+            // 3. Constrain stream container strictly to the AIR SPACE above the water level!
+            // Cup total height is 224px. The liquid level is prevPercent (0% to 100%).
+            // The air space bottom matches the liquid surface height!
+            airSpace.style.bottom = `${prevPercent}%`;
+
+            // Calculate stream thickness based on amount (small: ~8px, large: ~22px)
+            const streamWidth = Math.min(24, Math.max(7, Math.round(Math.sqrt(amount) * 0.95)));
+
+            // 4. Create stream: runs from top rim down to EXACTLY the bottom of the air space (water surface!)
+            const stream = document.createElement('div');
+            stream.className = 'pouring-stream absolute top-0 left-1/2 -translate-x-1/2 rounded-b-full z-20';
+            stream.style.width = `${streamWidth}px`;
+            stream.style.height = `100%`; // Fills ONLY the air space above water surface!
+            airSpace.appendChild(stream);
+
+            // 5. Create impact splash & ripples at the EXACT liquid surface impact point
+            const dropCount = Math.min(12, Math.max(5, Math.round(amount / 45)));
+
+            // Circular ripple ring on water surface
+            const ripple = document.createElement('div');
+            ripple.className = 'surface-ripple left-1/2 -translate-x-1/2 bottom-0';
+            ripple.style.width = `${streamWidth * 1.8}px`;
+            ripple.style.height = `${streamWidth * 0.8}px`;
+            airSpace.appendChild(ripple);
+
+            // Upward water splash drops bouncing off the water surface
+            for (let i = 0; i < dropCount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'splash-drop bg-cyan-100 border border-white shadow-sm';
+                const size = Math.random() * 4 + 3;
+                // Angle spray upward into the air (-160 deg to -20 deg)
+                const angle = -(Math.random() * Math.PI * 0.8 + Math.PI * 0.1);
+                const distance = Math.random() * (streamWidth * 1.5) + 12;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * (distance * 0.75);
+
+                drop.style.width = `${size}px`;
+                drop.style.height = `${size}px`;
+                drop.style.left = `calc(50% - ${size/2}px)`;
+                drop.style.bottom = `2px`; // Starts right on top of water surface!
+                drop.style.setProperty('--tx', `${tx}px`);
+                drop.style.setProperty('--ty', `${ty}px`);
+                drop.style.animationDelay = `${Math.random() * 0.12}s`;
+
+                airSpace.appendChild(drop);
+            }
+
+            // 6. Spawn rising air bubbles inside the liquid body
+            const bubbleCount = Math.min(7, Math.max(3, Math.round(amount / 70)));
+            for (let b = 0; b < bubbleCount; b++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'stream-bubble';
+                const bSize = Math.random() * 6 + 3.5;
+                bubble.style.width = `${bSize}px`;
+                bubble.style.height = `${bSize}px`;
+                bubble.style.left = `${Math.random() * 70 + 15}%`;
+                bubble.style.bottom = `${Math.random() * 18 + 4}px`;
+                bubble.style.animationDelay = `${Math.random() * 0.25}s`;
+                bubblesContainer.appendChild(bubble);
+
+                setTimeout(() => bubble.remove(), 850);
+            }
+
+            // 7. Gradually shorten the stream as the water level rises to newPercent
+            setTimeout(() => {
+                airSpace.style.transition = 'bottom 0.5s ease-out';
+                airSpace.style.bottom = `${newPercent}%`;
+            }, 80);
+
+            // 8. Clean up stream and hide spout badge after pouring completes
+            setTimeout(() => {
+                airSpace.innerHTML = '';
+                airSpace.style.transition = '';
+                spoutBadge.classList.remove('opacity-100', 'translate-y-0');
+                spoutBadge.classList.add('opacity-0', 'translate-y-1');
+            }, 660);
+        }
+
+        function getTodayStr() {
+            const d = new Date();
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        function formatTime(ts) {
+            const d = new Date(ts);
+            return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            document.getElementById('toast-text').textContent = msg;
+            t.classList.remove('opacity-0');
+            t.classList.add('opacity-100');
+            setTimeout(() => {
+                t.classList.remove('opacity-100');
+                t.classList.add('opacity-0');
+            }, 1800);
+        }
+
+        function loadData() {
+            try {
+                // Check both ocean key and fallback to previous Wayne key if migrating
+                const savedGoal = localStorage.getItem(STORAGE_KEY_GOAL) || localStorage.getItem('wayne_simple_water_goal');
+                if (savedGoal) dailyGoal = parseInt(savedGoal) || 2500;
+
+                const savedSound = localStorage.getItem(STORAGE_KEY_SOUND);
+                if (savedSound !== null) soundEnabled = savedSound === 'true';
+
+                const savedLogs = localStorage.getItem(STORAGE_KEY_LOGS) || localStorage.getItem('wayne_simple_water_logs');
+                if (savedLogs) logs = JSON.parse(savedLogs);
+            } catch (e) {
+                console.warn(e);
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY_GOAL, dailyGoal.toString());
+                localStorage.setItem(STORAGE_KEY_SOUND, soundEnabled.toString());
+                localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logs));
+            } catch (e) {}
+        }
+
+        function updateMainView() {
+            const today = getTodayStr();
+            const todayLogs = logs.filter(l => l.date === today);
+            const total = todayLogs.reduce((sum, item) => sum + item.amount, 0);
+            const percent = Math.min(100, Math.round((total / dailyGoal) * 100)) || 0;
+            const remaining = Math.max(0, dailyGoal - total);
+
+            const goalInput = document.getElementById('goal-input');
+            if (goalInput) goalInput.value = dailyGoal;
+
+            const goalEl = document.getElementById('today-goal');
+            if (goalEl) goalEl.textContent = dailyGoal;
+
+            const totalEl = document.getElementById('today-total');
+            if (totalEl) totalEl.textContent = total;
+
+            const remEl = document.getElementById('today-remaining');
+            if (remEl) remEl.textContent = remaining;
+
+            const percentLabel = document.getElementById('percent-label');
+            if (percentLabel) percentLabel.textContent = `${percent}%`;
+
+            const liquidBar = document.getElementById('liquid-bar');
+            if (liquidBar) liquidBar.style.height = `${percent}%`;
+
+            const soundBtn = document.getElementById('sound-btn');
+            if (soundBtn) {
+                soundBtn.textContent = soundEnabled ? '💧' : '🔇';
+                soundBtn.title = soundEnabled ? '音效已開' : '音效已關';
+            }
+        }
+
+        function renderStatsModal() {
+            // Render 7-day chart
+            const chart = document.getElementById('stats-chart');
+            chart.innerHTML = '';
+
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const y = d.getFullYear();
+                const m = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                const dateStr = `${y}-${m}-${day}`;
+                const label = i === 0 ? '今' : `${d.getMonth() + 1}/${d.getDate()}`;
+
+                const dayLogs = logs.filter(l => l.date === dateStr);
+                const daySum = dayLogs.reduce((a, b) => a + b.amount, 0);
+                const ratio = Math.min(1, daySum / dailyGoal);
+                const heightPercent = Math.max(10, Math.round(ratio * 100));
+                const reached = daySum >= dailyGoal;
+
+                const col = document.createElement('div');
+                col.className = "flex-1 flex flex-col items-center justify-end h-full";
+                col.innerHTML = `
+                    <div class="text-[9px] text-ocean-600 font-semibold mb-1">${daySum > 0 ? (daySum >= 1000 ? (daySum/1000).toFixed(1)+'k' : daySum) : ''}</div>
+                    <div class="w-full max-w-[20px] rounded-t-lg transition-all ${reached ? 'bg-gradient-to-t from-amber-400 to-yellow-300 shadow-sm' : (daySum > 0 ? 'bg-gradient-to-t from-ocean-500 to-cyan-300' : 'bg-ocean-100')}" style="height: ${heightPercent}%"></div>
+                    <span class="text-[9px] text-ocean-500 mt-1 font-medium">${label}</span>
+                `;
+                chart.appendChild(col);
+            }
+
+            // Render today's log items
+            const logsContainer = document.getElementById('logs-container');
+            logsContainer.innerHTML = '';
+            const todayLogs = logs.filter(l => l.date === getTodayStr()).sort((a, b) => b.time - a.time);
+
+            if (todayLogs.length === 0) {
+                logsContainer.innerHTML = `<div class="text-center py-5 text-xs text-ocean-400 font-medium">今日還沒有喝水記錄唷 🌊</div>`;
+                return;
+            }
+
+            todayLogs.forEach(item => {
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-2.5 rounded-xl bg-white border border-ocean-100 text-xs shadow-sm";
+                row.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400"></span>
+                        <span class="text-ocean-800 font-bold">+${item.amount} ml</span>
+                        <span class="text-[10px] text-ocean-400">${formatTime(item.time)}</span>
+                    </div>
+                    <button data-id="${item.id}" class="delete-btn text-ocean-300 hover:text-red-500 text-xs px-1.5 transition-colors">刪除</button>
+                `;
+                logsContainer.appendChild(row);
+            });
+
+            logsContainer.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.currentTarget.getAttribute('data-id');
+                    logs = logs.filter(l => l.id !== id);
+                    saveData();
+                    updateMainView();
+                    renderStatsModal();
+                    showToast('已刪除紀錄');
+                });
+            });
+        }
+
+        function addIntake(amount) {
+            if (!amount || amount <= 0) return;
+            const today = getTodayStr();
+            const prevTotal = logs.filter(l => l.date === today).reduce((sum, item) => sum + item.amount, 0);
+            const prevPercent = Math.min(100, Math.round((prevTotal / dailyGoal) * 100)) || 0;
+
+            const newLog = {
+                id: 'log_' + Date.now(),
+                date: today,
+                time: Date.now(),
+                amount: parseInt(amount)
+            };
+            logs.push(newLog);
+            saveData();
+
+            const newTotal = prevTotal + newLog.amount;
+            const newPercent = Math.min(100, Math.round((newTotal / dailyGoal) * 100)) || 0;
+            const reached = newTotal >= dailyGoal;
+
+            // Trigger pouring animation with relative scale and liquid response
+            triggerPourAnimation(newLog.amount, prevPercent, newPercent);
+            playWaterChime(newLog.amount, reached);
+            showToast(`已注入 ${amount} ml 水量！`);
+            updateMainView();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            updateMainView();
+
+            // Goal Input change
+            const goalInput = document.getElementById('goal-input');
+            goalInput.addEventListener('change', () => {
+                const val = parseInt(goalInput.value);
+                if (val >= 500 && val <= 8000) {
+                    dailyGoal = val;
+                    saveData();
+                    updateMainView();
+                    showToast(`每日目標更新為 ${dailyGoal} ml`);
+                }
+            });
+
+            // Quick add buttons
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const amount = parseInt(btn.getAttribute('data-amount'));
+                    addIntake(amount);
+                });
+            });
+
+            // Custom amount form
+            const customForm = document.getElementById('custom-add-form');
+            const customAmount = document.getElementById('custom-amount');
+            customForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const amt = parseInt(customAmount.value);
+                if (amt > 0) {
+                    addIntake(amt);
+                    customAmount.value = '';
+                }
+            });
+
+            // Sound Toggle
+            document.getElementById('sound-btn').addEventListener('click', () => {
+                soundEnabled = !soundEnabled;
+                saveData();
+                updateMainView();
+                if (soundEnabled) playWaterChime(false);
+            });
+
+            // Stats Modal controls
+            const statsModal = document.getElementById('stats-modal');
+            document.getElementById('open-stats-btn').addEventListener('click', () => {
+                renderStatsModal();
+                statsModal.classList.remove('hidden');
+            });
+
+            function closeModal() {
+                statsModal.classList.add('hidden');
+            }
+            document.getElementById('close-stats-btn').addEventListener('click', closeModal);
+            document.getElementById('stats-done-btn').addEventListener('click', closeModal);
+
+            // Clear Today's logs inside modal
+            document.getElementById('clear-today-btn').addEventListener('click', () => {
+                const today = getTodayStr();
+                logs = logs.filter(l => l.date !== today);
+                saveData();
+                updateMainView();
+                renderStatsModal();
+                showToast('已清空今日紀錄');
+            });
+        });
+    </script>
+</body>
+</html>
