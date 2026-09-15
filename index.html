@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>林新善 Margen Lin | Senior Backend & System Engineer</title>
+    
+    <!-- Google Fonts: Inter for clean typography and JetBrains Mono for precision metrics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            900: '#061626',
+                            800: '#0A2540', /* Primary Text Color */
+                            700: '#14385C',
+                            600: '#1F4B78',
+                        },
+                        royal: {
+                            DEFAULT: '#0052CC', /* Accent Primary */
+                            hover: '#0747A6',
+                            light: '#E9F2FF'
+                        },
+                        smartCyan: {
+                            DEFAULT: '#00B8D9', /* Accent Secondary */
+                            light: '#E6FCFF'
+                        },
+                        canvas: {
+                            bg: '#F5F7FA', /* Soft Neutral Light Gray */
+                            surface: '#FFFFFF',
+                            border: '#E3E8EE'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Menlo', 'Monaco', 'Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            color: #0A2540;
+            background-color: #F5F7FA;
+            font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+        }
+        
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Subtle grid pattern using purely SVG background */
+        .vector-grid-pattern {
+            background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Print styles for export */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            body {
+                background: #FFFFFF !important;
+                color: #0A2540 !important;
+            }
+            .page-break {
+                page-break-before: always;
+            }
+            .shadow-sm, .shadow-md, .shadow-lg {
+                box-shadow: none !important;
+                border: 1px solid #CBD5E1 !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans selection:bg-royal selection:text-white antialiased">
+
+    <nav class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-canvas-border transition-all">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-3 group">
+                <!-- Clean Vector Monogram -->
+                <div class="w-9 h-9 rounded-lg bg-navy-800 flex items-center justify-center text-white font-mono font-bold text-sm tracking-tighter group-hover:bg-royal transition-colors">
+                    ML
+                </div>
+                <div>
+                    <span class="font-bold tracking-tight text-navy-800 text-base">林新善</span>
+                    <span class="text-xs text-slate-500 font-mono ml-1.5 hidden sm:inline">Margen Lin</span>
+                </div>
+            </a>
+
+            <div class="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-600">
+                <a href="#about" class="hover:text-royal transition-colors">簡介</a>
+                <a href="#metrics" class="hover:text-royal transition-colors">核心指標</a>
+                <a href="#architecture" class="hover:text-royal transition-colors">架構實踐</a>
+                <a href="#skills" class="hover:text-royal transition-colors">技術棧</a>
+                <a href="#experience" class="hover:text-royal transition-colors">工作經歷</a>
+                <a href="#education" class="hover:text-royal transition-colors">學歷與研究</a>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <button onclick="copyContact('email')" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md border border-canvas-border bg-white text-navy-800 hover:bg-slate-50 hover:border-slate-300 transition-colors">
+                    <svg class="w-3.5 h-3.5 text-royal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                    </svg>
+                    <span>Email</span>
+                </button>
+                <button onclick="window.print()" class="no-print inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold rounded-md bg-navy-800 text-white hover:bg-royal transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
+                    </svg>
+                    <span>列印履歷</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header id="about" class="relative bg-white border-b border-canvas-border overflow-hidden">
+        <!-- Minimal Geometric Accents (Corporate Vector) -->
+        <div class="absolute right-0 top-0 w-96 h-96 pointer-events-none opacity-40 vector-grid-pattern hidden lg:block"></div>
+        <div class="absolute -right-12 -top-12 w-64 h-64 rounded-full border border-slate-200 pointer-events-none hidden lg:block"></div>
+        <div class="absolute right-40 top-32 w-28 h-28 rounded-full border-2 border-royal/10 pointer-events-none hidden lg:block"></div>
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16 relative">
+            <div class="flex flex-col md:flex-row md:items-start justify-between gap-8">
+                <div class="max-w-3xl">
+                    <!-- Profile Avatar & Title Block -->
+                    <div class="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 mb-5">
+                        <div class="relative flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28">
+                            <img src="https://ant4641.github.io/my-sites/Margen_1.jpg" 
+                                 alt="林新善 Margen Lin" 
+                                 class="w-full h-full object-cover rounded-2xl border-2 border-white shadow-sm ring-1 ring-slate-200/80"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/112x112/0A2540/FFFFFF?text=ML';" />
+                            <!-- Active Status Dot -->
+                            <div class="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-white shadow-xs" title="線上開放討論"></div>
+                        </div>
+                        <div>
+                            <!-- Status pill -->
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-royal-light text-royal text-xs font-semibold tracking-wide uppercase mb-2.5">
+                                <span class="w-1.5 h-1.5 rounded-full bg-royal animate-pulse"></span>
+                                資深後端工程師 & 系統架構規劃
+                            </div>
+
+                            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-navy-800 tracking-tight leading-tight">
+                                林新善 <span class="text-2xl sm:text-3xl text-slate-400 font-normal ml-2 font-mono">Margen Lin</span>
+                            </h1>
+                        </div>
+                    </div>
+
+                    <p class="mt-4 text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
+                        具備 <span class="font-semibold text-navy-800">5 年以上後端開發經驗</span>，深耕 <span class="font-semibold text-navy-800">Java (Spring Boot)</span> 與 <span class="font-semibold text-navy-800">PHP (Laravel)</span>。專精於「<span class="text-royal font-semibold">大型高可用商業系統重構</span>」與「<span class="text-royal font-semibold">高複雜度 IoT 軟硬體整合（門禁／車辨／串流）</span>」。
+                    </p>
+
+                    <p class="mt-2.5 text-sm sm:text-base text-slate-500 leading-relaxed">
+                        善於導入 <strong>DDD</strong> 與 <strong>SOLID</strong> 架構原則、SQL 效能深度調優與 CI/CD 自動化測試鏈。兼具跨部門規格溝通與核心模組落地能力，重視系統極致穩定性與長期維護價值。
+                    </p>
+
+                    <!-- Contact & Metadata quick row -->
+                    <div class="mt-6 flex flex-wrap items-center gap-y-2 gap-x-6 text-xs sm:text-sm font-mono text-slate-600 pt-4 border-t border-slate-100">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-400 font-sans">信箱:</span>
+                            <button onclick="copyContact('email')" class="hover:text-royal font-semibold underline decoration-dotted underline-offset-4">
+                                hsinshanlin@gmail.com
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-400 font-sans">電話:</span>
+                            <button onclick="copyContact('phone')" class="hover:text-royal font-semibold underline decoration-dotted underline-offset-4">
+                                0972-109-721
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-400 font-sans">語文:</span>
+                            <span class="text-navy-800 font-medium">English (TOEIC 綠色證書)</span>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-400 font-sans">學歷:</span>
+                            <span class="text-navy-800 font-medium">國立聯合大學 資管系 (GPA 4.0 / PR99)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Geometric Vector Illustration Box -->
+                <div class="w-full md:w-64 flex-shrink-0 bg-canvas-bg rounded-xl border border-canvas-border p-5 relative">
+                    <div class="text-xs font-mono font-semibold uppercase tracking-wider text-slate-400 mb-3 flex items-center justify-between">
+                        <span>Architecture Core</span>
+                        <div class="w-2 h-2 rounded-full bg-smartCyan"></div>
+                    </div>
+                    
+                    <div class="space-y-3 font-mono text-xs">
+                        <div class="p-2.5 rounded bg-white border border-slate-200 flex items-center justify-between">
+                            <span class="text-slate-600">Domain</span>
+                            <span class="font-semibold text-navy-800">DDD & SOLID</span>
+                        </div>
+                        <div class="p-2.5 rounded bg-white border border-slate-200 flex items-center justify-between">
+                            <span class="text-slate-600">Concurrency</span>
+                            <span class="font-semibold text-royal">Kafka & MVCC</span>
+                        </div>
+                        <div class="p-2.5 rounded bg-white border border-slate-200 flex items-center justify-between">
+                            <span class="text-slate-600">Hardware</span>
+                            <span class="font-semibold text-navy-800">RTSP & Modbus</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-3 border-t border-slate-200/80 text-[11px] text-slate-400 leading-tight">
+                        精準度量化、零掉單保證與高防禦性例外架構設計
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="metrics" class="py-12 bg-canvas-bg border-b border-canvas-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-xs font-mono font-bold tracking-widest text-royal uppercase">Verified Performance Metrics</h2>
+                    <p class="text-xl sm:text-2xl font-bold text-navy-800 mt-1">關鍵數值量化成果</p>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline">實測數據 / 零容錯工程要求</span>
+            </div>
+
+            <!-- Monospace Data Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Metric 1 -->
+                <div class="bg-white rounded-xl p-5 border border-canvas-border shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative group hover:border-royal transition-colors">
+                    <div class="flex items-baseline justify-between mb-2">
+                        <span class="font-mono text-3xl font-extrabold text-navy-800 tracking-tight tabular-nums">1,680<span class="text-royal text-xl font-normal">萬筆</span></span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">100% 零掉單</span>
+                    </div>
+                    <div class="font-semibold text-sm text-navy-800 mb-1">大數據日誌串流管道壓測</div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        主導 Kafka/ELK 1GB 壓力測試與 Snappy 壓縮演算法評估，節省 85% 磁碟空間並達成百萬級無損即時寫入。
+                    </p>
+                </div>
+
+                <!-- Metric 2 -->
+                <div class="bg-white rounded-xl p-5 border border-canvas-border shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative group hover:border-royal transition-colors">
+                    <div class="flex items-baseline justify-between mb-2">
+                        <span class="font-mono text-3xl font-extrabold text-navy-800 tracking-tight tabular-nums">+87<span class="text-royal text-xl font-normal">%</span></span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-blue-50 text-royal border border-blue-100">查詢效率躍升</span>
+                    </div>
+                    <div class="font-semibold text-sm text-navy-800 mb-1">開戶系統後端查詢調優</div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        針對口袋證券核心開戶系統優化客戶資料 SQL 語法與架構重構，大幅削減高延遲瓶頸。
+                    </p>
+                </div>
+
+                <!-- Metric 3 -->
+                <div class="bg-white rounded-xl p-5 border border-canvas-border shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative group hover:border-royal transition-colors">
+                    <div class="flex items-baseline justify-between mb-2">
+                        <span class="font-mono text-3xl font-extrabold text-navy-800 tracking-tight tabular-nums">+90<span class="text-royal text-xl font-normal">%</span></span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-sky-50 text-sky-700 border border-sky-100">MVCC 零鎖表</span>
+                    </div>
+                    <div class="font-semibold text-sm text-navy-800 mb-1">MariaDB Slave 重建機制</div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        引入一致性快照解決 Race Condition 隱患，使線上即時備份與叢集資料庫同步穩定度提升至 90%。
+                    </p>
+                </div>
+
+                <!-- Metric 4 -->
+                <div class="bg-white rounded-xl p-5 border border-canvas-border shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative group hover:border-royal transition-colors">
+                    <div class="flex items-baseline justify-between mb-2">
+                        <span class="font-mono text-3xl font-extrabold text-navy-800 tracking-tight tabular-nums">$10,000<span class="text-slate-400 text-sm font-normal ml-1">USD</span></span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100">年度成本節省</span>
+                    </div>
+                    <div class="font-semibold text-sm text-navy-800 mb-1">MSSQL 自動排程備份還原</div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        自研自動化備份與驗證還原程式，直接替代昂貴的原廠雲端升級方案，確保冷熱資料容災。
+                    </p>
+                </div>
+
+                <!-- Metric 5 -->
+                <div class="bg-white rounded-xl p-5 border border-canvas-border shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative group hover:border-royal transition-colors">
+                    <div class="flex items-baseline justify-between mb-2">
+                        <span class="font-mono text-3xl font-extrabold text-navy-800 tracking-tight tabular-nums">50<span class="text-royal text-xl font-normal">支</span> + 15<span class="text-royal text-xl font-normal">設備</span></span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-cyan-50 text-cyan-800 border border-cyan-100">RTSP & Modbus</span>
+                    </div>
+                    <div class="font-semibold text-sm text-navy-800 mb-1">高併發 IoT 長照與車牌案場</div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        即時轉流控管 50 支監控畫面，整合 ETC、門禁、IO Box，在 3 座實體停車案場全流程落地測試。
+                    </p>
+                </div>
+
+                <!-- Metric 6 -->
+                <div class="bg-white rounded-xl p-5 border border-canvas-border shadow-[0_1px_3px_rgba(0,0,0,0.02)] relative group hover:border-royal transition-colors">
+                    <div class="flex items-baseline justify-between mb-2">
+                        <span class="font-mono text-3xl font-extrabold text-navy-800 tracking-tight tabular-nums">205<span class="text-slate-400 text-lg font-normal">個檔案</span></span>
+                        <span class="px-2 py-0.5 rounded text-[11px] font-mono font-semibold bg-purple-50 text-purple-700 border border-purple-100">CI/CD E2E</span>
+                    </div>
+                    <div class="font-semibold text-sm text-navy-800 mb-1">全自動化測試鏈重構</div>
+                    <p class="text-xs text-slate-500 leading-relaxed">
+                        主導修復 350+ 個測試 Method，並整合 Jest E2E 自動化鏈，使軟體測試效率提升 5 倍。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="architecture" class="py-14 bg-white border-b border-canvas-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
+                <div>
+                    <h2 class="text-xs font-mono font-bold tracking-widest text-royal uppercase">System Architecture Blueprint</h2>
+                    <p class="text-xl sm:text-2xl font-bold text-navy-800 mt-1">核心技術架構藍圖</p>
+                </div>
+                <!-- Architecture Diagram Tabs -->
+                <div class="inline-flex rounded-lg p-1 bg-slate-100 border border-slate-200 text-xs font-medium">
+                    <button id="btn-tab-fintech" onclick="switchArch('fintech')" class="px-3.5 py-1.5 rounded-md bg-white text-navy-800 font-semibold shadow-xs transition-all">
+                        金融日誌與高併發交易管道
+                    </button>
+                    <button id="btn-tab-iot" onclick="switchArch('iot')" class="px-3.5 py-1.5 rounded-md text-slate-600 hover:text-navy-800 transition-all">
+                        IoT 軟硬體邊緣與串流架構
+                    </button>
+                </div>
+            </div>
+
+            <!-- Architecture Diagram View 1: FinTech Pipeline -->
+            <div id="arch-view-fintech" class="border border-canvas-border rounded-xl p-6 sm:p-8 bg-slate-50/50">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+                    <!-- Step 1 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-royal font-semibold mb-1">01 / INGESTION</div>
+                            <h3 class="text-sm font-bold text-navy-800">Paysafe & 交易回呼</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                點數卡/錢包/轉帳多管道對接。實作 Webhook 非同步回呼與交易冪等性，嚴格確保零重複、零掉單。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            Spring Boot + Redis
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-royal font-semibold mb-1">02 / PIPELINE</div>
+                            <h3 class="text-sm font-bold text-navy-800">Kafka 串流與 Snappy 壓縮</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                評估 Snappy 壓縮演算法，1GB 壓力測試無損寫入 1,680 萬筆日誌，直接精簡 85% 磁碟使用。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            Apache Kafka + Docker
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-royal font-semibold mb-1">03 / STORAGE</div>
+                            <h3 class="text-sm font-bold text-navy-800">MariaDB MVCC 零鎖表</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                重構 Slave 重建機制，引入一致性快照與 MVCC，解決 Race Condition，叢集同步穩定度 +90%。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            MariaDB + Snapshot
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-royal font-semibold mb-1">04 / AUDIT & ALARM</div>
+                            <h3 class="text-sm font-bold text-navy-800">ELK 監控與跨時區錨點</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                Elasticsearch 內外分離 HTTPS 憑證加密，結合極端時區 (UTC-11~+14) 告警錨點演算法。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            ELK Stack + HTTPS
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture Diagram View 2: IoT System (Hidden by default) -->
+            <div id="arch-view-iot" class="hidden border border-canvas-border rounded-xl p-6 sm:p-8 bg-slate-50/50">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+                    <!-- IoT Step 1 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-smartCyan font-semibold mb-1">01 / HARDWARE EDGE</div>
+                            <h3 class="text-sm font-bold text-navy-800">感測與硬體串接</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                透過 Modbus TCP、IO Box、REST API 整合 15 種以上硬體（ETC 車牌機、門禁閘門、環境傳感器）。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            Modbus TCP + IO Box
+                        </div>
+                    </div>
+
+                    <!-- IoT Step 2 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-smartCyan font-semibold mb-1">02 / STREAMING</div>
+                            <h3 class="text-sm font-bold text-navy-800">50 路 RTSP 即時轉流</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                大樓長照中心即時監控攝影機畫面轉流管理，維持低延遲並提供即時緊急通報告警機制。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            RTSP Gateway + Node.js
+                        </div>
+                    </div>
+
+                    <!-- IoT Step 3 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-smartCyan font-semibold mb-1">03 / DOMAIN LOGIC</div>
+                            <h3 class="text-sm font-bold text-navy-800">DDD 模組化業務引擎</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                領域驅動設計 (DDD) 解耦訪客、車辨、空間燈光與設備告警模組，支援多案場靈活擴展。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            Spring Boot + Laravel DDD
+                        </div>
+                    </div>
+
+                    <!-- IoT Step 4 -->
+                    <div class="bg-white p-4 rounded-lg border border-slate-200 flex flex-col justify-between">
+                        <div>
+                            <div class="font-mono text-[11px] text-smartCyan font-semibold mb-1">04 / FIELD DEPLOYMENT</div>
+                            <h3 class="text-sm font-bold text-navy-800">3 處實體案場部署驗證</h3>
+                            <p class="text-xs text-slate-500 mt-2">
+                                親赴案場執行車輛進出場全流程實測，結合車牌辨識演算法與硬體聯動，達成節能與全自動化運維。
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-2 border-t border-slate-100 text-[11px] font-mono text-slate-400">
+                            Field Tested in 3 Sites
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="py-14 bg-canvas-bg border-b border-canvas-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="max-w-2xl mb-10">
+                <h2 class="text-xs font-mono font-bold tracking-widest text-royal uppercase">Engineering Competency</h2>
+                <p class="text-xl sm:text-2xl font-bold text-navy-800 mt-1">專業技能與工具體系</p>
+                <p class="text-sm text-slate-500 mt-2">
+                    以物件導向 (OOP) 與領域驅動 (DDD) 為核心基石，貫穿資料庫調優、串流吞吐與維運自動化。
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Skill Group 1: Backend Core -->
+                <div class="bg-white p-5 rounded-xl border border-canvas-border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-2.5 h-2.5 rounded-full bg-navy-800"></div>
+                        <h3 class="font-bold text-sm text-navy-800">後端與核心語言</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-navy-800 font-semibold">Java (Spring Boot)</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-navy-800 font-semibold">PHP (Laravel)</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">NodeJs</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Python</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Shell Script</span>
+                    </div>
+                </div>
+
+                <!-- Skill Group 2: DB & Stream -->
+                <div class="bg-white p-5 rounded-xl border border-canvas-border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-2.5 h-2.5 rounded-full bg-royal"></div>
+                        <h3 class="font-bold text-sm text-navy-800">資料庫與數據流</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded bg-royal-light text-xs font-mono text-royal font-semibold">Kafka</span>
+                        <span class="px-2.5 py-1 rounded bg-royal-light text-xs font-mono text-royal font-semibold">ELK Stack</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">MariaDB (MVCC)</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">MySQL</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">MSSQL</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Redis</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">MongoDB</span>
+                    </div>
+                </div>
+
+                <!-- Skill Group 3: Architecture & QA -->
+                <div class="bg-white p-5 rounded-xl border border-canvas-border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-2.5 h-2.5 rounded-full bg-smartCyan"></div>
+                        <h3 class="font-bold text-sm text-navy-800">架構與軟體工程</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded bg-smartCyan-light text-xs font-mono text-navy-800 font-semibold">DDD (領域驅動)</span>
+                        <span class="px-2.5 py-1 rounded bg-smartCyan-light text-xs font-mono text-navy-800 font-semibold">SOLID 原則</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Jest / Unit Test</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">CI/CD Pipeline</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">RESTful / Swagger</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">UML / SASD</span>
+                    </div>
+                </div>
+
+                <!-- Skill Group 4: Infrastructure & Frontend -->
+                <div class="bg-white p-5 rounded-xl border border-canvas-border">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-2.5 h-2.5 rounded-full bg-slate-400"></div>
+                        <h3 class="font-bold text-sm text-navy-800">運維環境與前端</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5">
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700 font-semibold">Docker</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Linux / Nginx</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Jboss / Tomcat</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Vue.js</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Flutter</span>
+                        <span class="px-2.5 py-1 rounded bg-slate-100 text-xs font-mono text-slate-700">Jira / Scrum</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="experience" class="py-14 bg-white border-b border-canvas-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between mb-10">
+                <div>
+                    <h2 class="text-xs font-mono font-bold tracking-widest text-royal uppercase">Professional Timeline</h2>
+                    <p class="text-xl sm:text-2xl font-bold text-navy-800 mt-1">實戰工作經歷</p>
+                </div>
+                <span class="text-xs font-mono text-slate-400 hidden sm:inline">5+ 年高併發商業系統與大型系統經驗</span>
+            </div>
+
+            <div class="space-y-8">
+                <!-- Job 1 -->
+                <div class="border border-canvas-border rounded-xl p-6 sm:p-7 hover:border-slate-300 transition-all bg-white relative">
+                    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-royal"></span>
+                            <h3 class="text-lg font-bold text-navy-800">全端工程師</h3>
+                            <span class="text-sm font-semibold text-royal">專案接案</span>
+                        </div>
+                        <div class="font-mono text-xs text-slate-500">
+                            2025/07 – 2026/08 <span class="text-slate-300">|</span> 1 年 1 個月
+                        </div>
+                    </div>
+
+                    <!-- Project Sub-block A -->
+                    <div class="mt-4 pt-3 border-t border-slate-100">
+                        <h4 class="text-sm font-bold text-navy-800 flex items-center gap-2">
+                            <span class="text-royal font-mono font-bold">【專案一】</span>集中式日誌管理平台開發與維運
+                        </h4>
+                        <ul class="mt-2.5 space-y-2 text-xs sm:text-sm text-slate-600 list-disc list-outside pl-5 leading-relaxed">
+                            <li><strong class="text-navy-800">MariaDB Slave 重建機制重構：</strong>引入一致性快照與 MVCC 機制實現線上零鎖表備份，消除 Race Condition 隱患，提升叢集同步穩定度達 90%。</li>
+                            <li><strong class="text-navy-800">大數據吞吐壓測與壓縮：</strong>主導 Kafka/ELK 1GB 壓力測試與 Snappy 壓縮演算法評估，驗證節省 85% Kafka 磁碟空間，並達成 1,680 萬筆資料 100% 零掉單無損寫入。</li>
+                            <li><strong class="text-navy-800">自動化測試鏈升級：</strong>主導修復 205 個 Unit/Feature Test 檔案（負責 60% 以上約 350 個 Method），加固 CI/CD 穩定度，並建立前端 Jest E2E 自動化測試鏈。</li>
+                            <li><strong class="text-navy-800">跨時區錨點與安全連線：</strong>重構全球極端時區 (UTC-11 ~ +14) 告警時間錨點演算法；將 Elasticsearch 通訊升級為 HTTPS，以內外網分離架構達成零效能損耗憑證連線。</li>
+                        </ul>
+                        <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[11px] text-slate-500">
+                            <span class="px-2 py-0.5 rounded bg-slate-100">PHP (Laravel)</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Vue.js</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">ELK</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Kafka</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">MariaDB</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Docker</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Jest</span>
+                        </div>
+                    </div>
+
+                    <!-- Project Sub-block B -->
+                    <div class="mt-5 pt-4 border-t border-slate-100">
+                        <h4 class="text-sm font-bold text-navy-800 flex items-center gap-2">
+                            <span class="text-royal font-mono font-bold">【專案二】</span>會員系統與交易平台核心開發
+                        </h4>
+                        <ul class="mt-2.5 space-y-2 text-xs sm:text-sm text-slate-600 list-disc list-outside pl-5 leading-relaxed">
+                            <li><strong class="text-navy-800">多元支付整合：</strong>整合 Paysafe 多元支付，對接點數卡、電子錢包、銀行轉帳與行動支付儲值；實作 Webhook 非同步回呼與交易冪等性，確保點數入帳零重複、零掉單。</li>
+                            <li><strong class="text-navy-800">技術擴充與運營賦能：</strong>主導第三方支付技術分享並撰寫規格文件向跨團隊簡報，顯著提升後續擴充效率；獨立開發營運 CMS 模組（自訂公告與橫幅發布）。</li>
+                        </ul>
+                        <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[11px] text-slate-500">
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Java (Spring Boot)</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Redis</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Git</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job 2 -->
+                <div class="border border-canvas-border rounded-xl p-6 sm:p-7 hover:border-slate-300 transition-all bg-white relative">
+                    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-navy-800"></span>
+                            <h3 class="text-lg font-bold text-navy-800">資深系統工程師</h3>
+                            <span class="text-sm font-semibold text-slate-700">口袋證券股份有限公司</span>
+                        </div>
+                        <div class="font-mono text-xs text-slate-500">
+                            2024/01 – 2024/12 <span class="text-slate-300">|</span> 1 年
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <p class="text-xs font-semibold text-royal uppercase tracking-wide">線上開戶系統架構重構（導入 DDD & SOLID）</p>
+                        <ul class="mt-2.5 space-y-2 text-xs sm:text-sm text-slate-600 list-disc list-outside pl-5 leading-relaxed">
+                            <li><strong class="text-navy-800">資料庫查詢調優：</strong>深度優化後端客戶資料查詢語法，成功提升查詢速度約 <strong>87%</strong>。</li>
+                            <li><strong class="text-navy-800">品質保證與排程監控：</strong>撰寫自動化測試程式，提升測試效率 <strong>5 倍</strong>；排程監視程式，即時發送警報至通訊軟體。</li>
+                            <li><strong class="text-navy-800">OpenCV 影像辨識優化：</strong>優化影像處理與辨識系統，提高 OCR 證件辨識率達 <strong>12%</strong>。</li>
+                            <li><strong class="text-navy-800">企業成本大幅精簡：</strong>自行撰寫 MSSQL 資料庫定期自動備份與還原校驗機制，替公司節省 <strong>10,000 美金</strong> 原廠升級服務費。</li>
+                            <li><strong class="text-navy-800">中文轉英文核心服務：</strong>自主開發高容錯「中文轉英文（地址、姓名）」服務，克服規則不完整與極端例外情境，支援數萬筆實際生產資料長期維運，完全取代昂貴的郵局介接系統。</li>
+                        </ul>
+                        <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[11px] text-slate-500">
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Java (Spring Boot)</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">MSSQL</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">OpenCV / Python</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Redis</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Jboss</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">RESTful API</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job 3 -->
+                <div class="border border-canvas-border rounded-xl p-6 sm:p-7 hover:border-slate-300 transition-all bg-white relative">
+                    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 mb-3">
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-smartCyan"></span>
+                            <h3 class="text-lg font-bold text-navy-800">後端工程師</h3>
+                            <span class="text-sm font-semibold text-slate-700">集星網路股份有限公司</span>
+                        </div>
+                        <div class="font-mono text-xs text-slate-500">
+                            2021/09 – 2024/01 <span class="text-slate-300">|</span> 2 年 4 個月
+                        </div>
+                    </div>
+
+                    <div class="mt-2 space-y-4">
+                        <div>
+                            <h4 class="text-xs font-bold text-navy-800 uppercase tracking-wide">
+                                1. 大樓管理系統（落地於台中某長照中心）
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-1">
+                                導入 DDD 架構門禁、停車場、訪客、空間設備、燈光管理模組。
+                            </p>
+                            <ul class="mt-1.5 space-y-1 text-xs sm:text-sm text-slate-600 list-disc list-outside pl-5 leading-relaxed">
+                                <li>使用 RTSP 轉流技術，同時控管 <strong>50 隻攝影機畫面</strong> 保持穩定低延遲。</li>
+                                <li>透過 Modbus TCP、IO Box、API 串接 15 種以上硬體設備，即時收集環境數據與緊急事件通報。</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h4 class="text-xs font-bold text-navy-800 uppercase tracking-wide">
+                                2. 電動車智能停車場管理系統（落地實體 3 處案場）
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-1">
+                                結合車牌辨識演算法，智能判定多元車輛進出場情景並驅動聯動硬體，達到極致節能與人力省卻。
+                            </p>
+                            <ul class="mt-1.5 space-y-1 text-xs sm:text-sm text-slate-600 list-disc list-outside pl-5 leading-relaxed">
+                                <li>導入 DDD 架構進行高度模組化切分，並透過 IO Box / API 整合多維感測訊號。</li>
+                                <li>親自至實體案場進行現場部署與車輛進出全流程閉環實測。</li>
+                            </ul>
+                        </div>
+
+                        <div class="mt-3 flex flex-wrap gap-1.5 font-mono text-[11px] text-slate-500">
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Java (Spring Boot)</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">PHP (Laravel)</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Modbus TCP / IO Box</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">RTSP</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">MySQL / MongoDB</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Docker</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job 4: AdTech & Career Exploration -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Career Exploration -->
+                    <div class="border border-canvas-border rounded-xl p-5 bg-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-bold text-navy-800">資訊接案與招募顧問職涯探索</h3>
+                            <span class="font-mono text-xs text-slate-400">2019/02 – 2021/09</span>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2 list-disc list-outside pl-4 leading-relaxed">
+                            <li><strong class="text-navy-800">海外科學教育：</strong>於海外 4 間國小任教科普實驗，因教學結構與互動優異獲選為「公開觀課」示範講師。</li>
+                            <li><strong class="text-navy-800">SOP 與腳本自動化：</strong>協助新創驗證官網功能建立 SOP 提升 30% 效率；撰寫自動化指令腳本將薪資結算效率提升 100%。</li>
+                            <li><strong class="text-navy-800">人才資料庫：</strong>建立職缺人才庫使效率提升 80%，聯繫超過 1,200 人，助人選獲逾 270 萬薪資。</li>
+                        </ul>
+                    </div>
+
+                    <!-- AdTech -->
+                    <div class="border border-canvas-border rounded-xl p-5 bg-white">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="text-sm font-bold text-navy-800">後端工程師 | 艾普特媒體</h3>
+                            <span class="font-mono text-xs text-slate-400">2018/08 – 2019/02</span>
+                        </div>
+                        <ul class="text-xs text-slate-600 space-y-2 list-disc list-outside pl-4 leading-relaxed">
+                            <li><strong class="text-navy-800">AdTech 平台維運：</strong>維運 DSP 下單與 SSP 廣告串接 API。以 PHP / MongoDB / Redis 產出每日曝光率、CTR、利潤分潤報表供跨季銷售決策。</li>
+                            <li><strong class="text-navy-800">可視率演算法：</strong>實作可視面積 (Viewability &gt; 60%) 演算法，精準評估有效影片觀看時間。</li>
+                            <li><strong class="text-navy-800">流程規範導入：</strong>將 SDLC 規範引入團隊，繪製 Use Case 與流程圖，大幅降低 PM 需求規格模糊造成的返工率。</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="education" class="py-14 bg-canvas-bg border-b border-canvas-border">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <!-- Side Project Column (5 cols) -->
+                <div class="lg:col-span-5 space-y-6">
+                    <div>
+                        <h2 class="text-xs font-mono font-bold tracking-widest text-royal uppercase">Side Project</h2>
+                        <p class="text-xl font-bold text-navy-800 mt-1">即興劇互動系統</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 border border-canvas-border">
+                        <div class="flex items-center justify-between text-xs font-mono text-slate-400 mb-3">
+                            <span class="px-2 py-0.5 rounded bg-royal-light text-royal font-semibold">Active Development</span>
+                            <span>2024/09 – Present</span>
+                        </div>
+
+                        <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                            為即興劇團體設計並開發即時觀眾互動系統。觀眾可於手機端提交創意點子，後端即時處理並投影整合至現場演出舞臺中。
+                        </p>
+
+                        <div class="space-y-2 text-xs text-slate-600">
+                            <div class="flex items-start gap-2">
+                                <span class="text-royal font-bold">▪</span>
+                                <span>使用 Python, Flutter, RESTful API, MySQL 建置高並發即時收集機制，支援會員與新戲行銷。</span>
+                            </div>
+                            <div class="flex items-start gap-2">
+                                <span class="text-royal font-bold">▪</span>
+                                <span>整合 AI API 進行即興角色與情境生成，作為後續導入深度學習模型之實作驗證。</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap gap-1 font-mono text-[11px] text-slate-500">
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Python</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">Flutter</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">AI API Integration</span>
+                            <span class="px-2 py-0.5 rounded bg-slate-100">MySQL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education & Academic Column (7 cols) -->
+                <div class="lg:col-span-7 space-y-6">
+                    <div>
+                        <h2 class="text-xs font-mono font-bold tracking-widest text-royal uppercase">Academic Credentials & Papers</h2>
+                        <p class="text-xl font-bold text-navy-800 mt-1">學歷與研究論文</p>
+                    </div>
+
+                    <div class="bg-white rounded-xl p-6 border border-canvas-border space-y-6">
+                        <!-- Degree -->
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100">
+                            <div>
+                                <h3 class="text-base font-bold text-navy-800">國立聯合大學 資訊管理學系</h3>
+                                <p class="text-xs text-slate-500 font-mono mt-0.5">學士學位 | 2014/09 – 2018/06</p>
+                            </div>
+                            <div class="mt-2 sm:mt-0 flex items-center gap-2">
+                                <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 font-mono text-xs font-bold border border-emerald-100">
+                                    GPA 4.0 / 4.0 (PR99)
+                                </span>
+                                <span class="px-2 py-1 rounded bg-amber-50 text-amber-800 font-mono text-xs font-semibold border border-amber-100">
+                                    書卷獎
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Published Paper -->
+                        <div>
+                            <div class="font-mono text-[11px] font-semibold text-royal uppercase">IEEE Published Paper</div>
+                            <h4 class="text-sm font-bold text-navy-800 mt-1">
+                                Constructing ECA Rule for IoT Application through a Novel S2RG Process
+                            </h4>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">
+                                提出情境感知與事態規則產生架構（S2RG），解決物聯網複雜情境下的自動決策演算法，成果發表於 IEEE 期刊。
+                            </p>
+                        </div>
+
+                        <!-- Awards -->
+                        <div class="pt-4 border-t border-slate-100 space-y-2.5">
+                            <div class="font-mono text-[11px] font-semibold text-slate-400 uppercase">Honors & Competitions</div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-navy-800 font-medium">經濟部搶鮮大賽 - 創意發想類《708 節電霸》</span>
+                                <span class="font-mono font-semibold text-royal bg-royal-light px-2 py-0.5 rounded">全國優選・人氣獎</span>
+                            </div>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-navy-800 font-medium">IMP 國際研討會論文《以 ECA 規則應用情境感知之智慧節電系統》</span>
+                                <span class="font-mono font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded">佳作論文</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact" class="bg-white py-14">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-navy-900 rounded-2xl p-8 sm:p-12 text-white relative overflow-hidden">
+                <!-- Background Vector Art Grid Accent -->
+                <div class="absolute right-0 bottom-0 w-80 h-80 opacity-10 vector-grid-pattern pointer-events-none"></div>
+                <div class="absolute -left-16 -bottom-16 w-56 h-56 rounded-full border border-white/10 pointer-events-none"></div>
+
+                <div class="max-w-2xl relative z-10">
+                    <span class="text-xs font-mono font-bold tracking-widest text-smartCyan uppercase">Get in Touch</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight mt-2 text-white">
+                        期待為高穩定、高併發系統創造實質工程價值
+                    </h2>
+                    <p class="mt-3 text-sm text-slate-300 leading-relaxed">
+                        無論是大型商業系統重構、資料庫/日誌管道效能調優，或是 IoT 即時軟硬體整合專案，歡迎隨時透過 Email 或電話與我聯繫交流。
+                    </p>
+
+                    <div class="mt-8 flex flex-wrap items-center gap-4">
+                        <button onclick="copyContact('email')" class="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-royal hover:bg-royal-hover text-white text-sm font-semibold transition-colors shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                            <span>複製 Email：hsinshanlin@gmail.com</span>
+                        </button>
+                        
+                        <button onclick="copyContact('phone')" class="inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-navy-800 hover:bg-navy-700 text-white text-sm font-semibold border border-white/10 transition-colors">
+                            <svg class="w-4 h-4 text-smartCyan" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <span>致電：0972-109-721</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-400 font-mono">
+                    <div>© 2026 林新善 (Margen Lin) • All Rights Reserved.</div>
+                    <div class="mt-2 sm:mt-0 flex items-center gap-4">
+                        <span>Java & PHP Specialist</span>
+                        <span>•</span>
+                        <span>DDD & Concurrency Architecture</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-navy-800 text-white px-4 py-3 rounded-lg shadow-xl border border-slate-700 flex items-center gap-2.5 text-xs font-medium">
+            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+            <span id="toast-msg">已複製至剪貼簿！</span>
+        </div>
+    </div>
+
+    <script>
+        // Interactive Architecture Blueprint switcher
+        function switchArch(type) {
+            const fintechView = document.getElementById('arch-view-fintech');
+            const iotView = document.getElementById('arch-view-iot');
+            const btnFintech = document.getElementById('btn-tab-fintech');
+            const btnIot = document.getElementById('btn-tab-iot');
+
+            if (type === 'fintech') {
+                fintechView.classList.remove('hidden');
+                iotView.classList.add('hidden');
+                
+                btnFintech.className = "px-3.5 py-1.5 rounded-md bg-white text-navy-800 font-semibold shadow-xs transition-all";
+                btnIot.className = "px-3.5 py-1.5 rounded-md text-slate-600 hover:text-navy-800 transition-all";
+            } else {
+                fintechView.classList.add('hidden');
+                iotView.classList.remove('hidden');
+
+                btnIot.className = "px-3.5 py-1.5 rounded-md bg-white text-navy-800 font-semibold shadow-xs transition-all";
+                btnFintech.className = "px-3.5 py-1.5 rounded-md text-slate-600 hover:text-navy-800 transition-all";
+            }
+        }
+
+        // Copy contact information with foolproof iframe-compatible fallback
+        function copyContact(type) {
+            const textToCopy = type === 'email' ? 'hsinshanlin@gmail.com' : '0972109721';
+            const label = type === 'email' ? 'Email (hsinshanlin@gmail.com)' : '電話 (0972-109-721)';
+
+            const tempInput = document.createElement('textarea');
+            tempInput.value = textToCopy;
+            tempInput.style.position = 'fixed';
+            tempInput.style.opacity = '0';
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(`已成功複製 ${label} 至剪貼簿！`);
+            } catch (err) {
+                showToast(`請手動複製：${textToCopy}`);
+            }
+            document.body.removeChild(tempInput);
+        }
+
+        // Custom unobtrusive toast notification (Strictly avoid alert())
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.textContent = message;
+
+            clearTimeout(toastTimeout);
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
